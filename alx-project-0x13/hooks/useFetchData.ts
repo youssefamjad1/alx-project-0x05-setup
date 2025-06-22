@@ -1,7 +1,9 @@
 import { ImageProps } from "@/interfaces";
 import { useState } from "react";
 
-const useFetchData = <T, R extends { prompt: string }>() => {
+type HasPrompt = { prompt: string }; // minimum shape for R
+
+const useFetchData = <T, R extends HasPrompt>() => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [responseData, setResponseData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -10,7 +12,6 @@ const useFetchData = <T, R extends { prompt: string }>() => {
   const fetchData = async (endpoint: string, body: R) => {
     setIsLoading(true);
     setError(null);
-    
     try {
       const resp = await fetch(endpoint, {
         method: 'POST',
@@ -26,23 +27,13 @@ const useFetchData = <T, R extends { prompt: string }>() => {
 
       const result = await resp.json();
       setResponseData(result);
-      
-      if (result?.message) {
-        setGeneratedImages(prev => [
-          ...prev, 
-          { 
-            imageUrl: result.message, 
-            prompt: body.prompt 
-          }
-        ]);
-      }
-      
+      setGeneratedImages((prev) => [...prev, { imageUrl: result?.message, prompt: body.prompt }]);
     } catch (err) {
-      setError((err as Error).message || 'An unknown error occurred');
+      setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return {
     isLoading,
@@ -50,7 +41,7 @@ const useFetchData = <T, R extends { prompt: string }>() => {
     error,
     fetchData,
     generatedImages
-  }
-}
+  };
+};
 
 export default useFetchData;

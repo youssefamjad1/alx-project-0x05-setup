@@ -2,13 +2,14 @@ import { HEIGHT, WIDTH } from "@/constants";
 import { RequestProps } from "@/interfaces";
 import { NextApiRequest, NextApiResponse } from "next";
 
+
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   const gptApiKey = process.env.NEXT_PUBLIC_GPT_API_KEY;
   const gptUrl = "https://chatgpt-42.p.rapidapi.com/texttoimage";
 
   if (!gptApiKey || !gptUrl) {
-    return response.status(500).json({ error: "API key or URL is missing" });
-  }
+    return response.status(500).json({ error: "API key or URL is missing in environment variables" });
+  };
 
   try {
     const { prompt }: RequestProps = request.body;
@@ -28,8 +29,8 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
     });
 
     if (!res.ok) {
-      throw new Error("Failed to fetch from API");
-    }
+      throw new Error("Failed to fetch from DALLE");
+    };
 
     const data = await res.json();
 
@@ -38,11 +39,8 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
     });
   } catch (error) {
     console.error("Error in API route:", error);
-    return response.status(500).json({ 
-      error: "Internal server error",
-      fallbackImage: "https://via.placeholder.com/600x400?text=Error+Generating+Image"
-    });
-  }
-}
+    return response.status(500).json({ error: "Internal server error" });
+  };
+};
 
 export default handler;
