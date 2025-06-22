@@ -27,7 +27,6 @@ const useFetchData = <T, R extends { prompt: string }>() => {
       const result = await resp.json();
       setResponseData(result);
       
-      // Only add to generatedImages if we have an image URL
       if (result?.message) {
         setGeneratedImages(prev => [
           ...prev, 
@@ -50,8 +49,7 @@ const useFetchData = <T, R extends { prompt: string }>() => {
     responseData,
     error,
     fetchData,
-    generatedImages,
-    setGeneratedImages // Added for potential external management
+    generatedImages
   }
 }
 
